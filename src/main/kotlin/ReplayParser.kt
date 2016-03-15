@@ -8,43 +8,59 @@ import java.io.FileOutputStream
 import java.io.FileReader
 import java.io.IOException
 
-fun main(args: Array<String>) {
-    var s = "";
-    try {
-        val folder = File("replays");
-        val script = File("dependencies\\heroprotocol\\heroprotocol.py");
-        var count = 0;
-        val files = folder.listFiles();
-        for(file in files){
-            println(files.size)
-            try {
-                println("Loop #$count")
-                val output = File("replayJSONs\\output$count.txt")
-                var cmdLine = CommandLine("python");
-                cmdLine.addArgument(script.absolutePath);
-                cmdLine.addArgument("--trackerevents");
-                cmdLine.addArgument(file.absolutePath);
-                var out = FileOutputStream(output);
-                var executor = DefaultExecutor();
-                executor.streamHandler = PumpStreamHandler(out);
-                executor.setExitValue(0);
-                try {
-                    var exitValue = executor.execute(cmdLine);
-                    println("Something Went Right")
-                    println(exitValue);
-                    out.flush();
-                    out.close();
-
-                }catch(x: ExecuteException){
-                    println("Something Failed")
-                    out.flush();
-                    out.close();
-                }
-            } finally {
-                count++;
+class ReplayParser() {
+    val types = arrayOf("gameevents", "messageevents", "trackerevents", "attributeevents", "header", "details", "initdata", "stats");
+    /**
+     *Uses the heroprotocol python library to parse the replay file and write it to file
+     * - NOTE: In order to use this you MUST have a valid python v2.7 installation located in your PATH
+     *@param replay the replay File
+     *@param type what kind of parse to perform
+     *@param output the stream that the JSON will be written to
+     *@return empty string if success,  otherwise error information
+     */
+    fun parse(replay: File, type: String, output: FileOutputStream): String {
+        var isValidType = false;
+        for (ptype in types) {
+            if (ptype.equals(type)) {
+                isValidType = true;
+                break;
             }
         }
+        if (!isValidType) {
+            return "Incorrect Type Parameter";
+        }
+        val script = File("dependencies\\heroprotocol\\heroprotocol.py");
+        var cmdLine = CommandLine("python");
+        cmdLine.addArgument(script.absolutePath);
+        cmdLine.addArgument("--$type");
+        cmdLine.addArgument(replay.absolutePath);
+        var executor = DefaultExecutor();
+        executor.streamHandler = PumpStreamHandler(output);
+        executor.setExitValue(0);
+        try {
+            executor.execute(cmdLine);
+            output.flush();
+            return "";
 
+        } catch(x: ExecuteException) {
+            output.flush();
+            return x.message!!;
+        }
+    }
+}
+
+fun main(args: Array<String>) {
+    try {
+        val folder = File("replays");
+        var count = 0;
+        val files = folder.listFiles();
+        for (file in files) {
+            val out = FileOutputStream("replayJSONs\\output$count.txt");
+            val rp = ReplayParser();
+            println(rp.parse(file, "trackerevents", out));
+            out.close();
+            count++;
+        }
     } catch(x: IOException) {
         println(x.message);
     }
