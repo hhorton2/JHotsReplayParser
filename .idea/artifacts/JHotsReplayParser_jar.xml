@@ -1,0 +1,12 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="JHotsReplayParser:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/JHotsReplayParser_jar</output-path>
+    <root id="archive" name="JHotsReplayParser.jar">
+      <element id="module-output" name="KHotsReplayParser" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/github/google/gson/1.7/gson-1.7.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/dependencies/commons-exec-1.3.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/jetbrains/kotlin/kotlin-stdlib/1.0.0/kotlin-stdlib-1.0.0.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/jetbrains/kotlin/kotlin-runtime/1.0.0/kotlin-runtime-1.0.0.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>

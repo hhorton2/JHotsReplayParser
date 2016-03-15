@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/JHotsReplayParser.iml" filepath="$PROJECT_DIR$/JHotsReplayParser.iml" />
+      <module fileurl="file://$PROJECT_DIR$/KHotsReplayParser.iml" filepath="$PROJECT_DIR$/KHotsReplayParser.iml" />
     </modules>
   </component>
 </project>

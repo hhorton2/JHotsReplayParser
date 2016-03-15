@@ -54,9 +54,9 @@ fun main(args: Array<String>) {
         val folder = File("replays");
         var count = 0;
         val files = folder.listFiles();
+        val rp = ReplayParser();
         for (file in files) {
             val out = FileOutputStream("replayJSONs\\output$count.txt");
-            val rp = ReplayParser();
             println(rp.parse(file, "trackerevents", out));
             out.close();
             count++;
