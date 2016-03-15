@@ -1,3 +1,4 @@
+import com.google.gson.Gson
 import com.google.gson.stream.JsonReader
 import org.apache.commons.exec.CommandLine
 import org.apache.commons.exec.DefaultExecutor
@@ -7,6 +8,7 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.FileReader
 import java.io.IOException
+import java.util.*
 
 class ReplayParser() {
     val types = arrayOf("gameevents", "messageevents", "trackerevents", "attributeevents", "header", "details", "initdata", "stats");
@@ -47,65 +49,114 @@ class ReplayParser() {
             return x.message!!;
         }
     }
+    fun getStats(replayJSON: File): ArrayList<String> {
+        var input = JsonReader(FileReader(replayJSON));
+        while (input.hasNext()) {
+            try {
+                input.beginObject();
+                input.isLenient = true;
+                while (input.hasNext()) {
+                    val name = input.nextName();
+                    //System.out.print(name + " | ");
+                    if (name.equals("m_eventName")) {
+                        val event = input.nextString();
+                        if (event.equals("PlayerSpawned")) {
+                            input.nextName();
+                            input.skipValue();
+                            input.nextName();
+                            input.beginArray();
+                            input.beginObject();
+                            input.nextName();
+                            input.skipValue();
+                            input.nextName();
+                            val playerId = input.nextInt();
+                            input.endObject();
+                            input.endArray();
+                            input.nextName();
+                            input.beginArray();
+                            input.beginObject();
+                            input.nextName();
+                            input.skipValue();
+                            input.nextName();
+                            println(event + " | " + playerId + " | " + input.nextString());
+                            input.endObject();
+                            input.endArray();
+                        }
+                    } else {
+                        //System.out.println();
+                        input.skipValue();
+                    }
+                }
+                //System.out.println("\n");
+                input.endObject();
+            } catch (y: IllegalStateException) {
+                input.close();
+                break;
+            }
+        }
+        return ArrayList<String>();
+    }
 }
 
 fun main(args: Array<String>) {
-    try {
-        val folder = File("replays");
-        var count = 0;
-        val files = folder.listFiles();
-        val rp = ReplayParser();
-        for (file in files) {
-            val out = FileOutputStream("replayJSONs\\output$count.txt");
-            println(rp.parse(file, "trackerevents", out));
-            out.close();
-            count++;
-        }
-    } catch(x: IOException) {
-        println(x.message);
-    }
-    var input = JsonReader(FileReader("output.txt"));
-    while (input.hasNext()) {
-        try {
-            input.beginObject();
-            input.isLenient = true;
-            while (input.hasNext()) {
-                val name = input.nextName();
-                //System.out.print(name + " | ");
-                if (name.equals("m_eventName")) {
-                    val event = input.nextString();
-                    if (event.equals("PlayerSpawned")) {
-                        input.nextName();
-                        input.skipValue();
-                        input.nextName();
-                        input.beginArray();
-                        input.beginObject();
-                        input.nextName();
-                        input.skipValue();
-                        input.nextName();
-                        val playerId = input.nextInt();
-                        input.endObject();
-                        input.endArray();
-                        input.nextName();
-                        input.beginArray();
-                        input.beginObject();
-                        input.nextName();
-                        input.skipValue();
-                        input.nextName();
-                        println(event + " | " + playerId + " | " + input.nextString());
-                        input.endObject();
-                        input.endArray();
-                    }
-                } else {
-                    //System.out.println();
-                    input.skipValue();
-                }
-            }
-            //System.out.println("\n");
-            input.endObject();
-        } catch (y: IllegalStateException) {
-            input.close();
-            break;
-        }
-    }
+//    try {
+//        val folder = File("replays");
+//        var count = 0;
+//        val files = folder.listFiles();
+//        val rp = ReplayParser();
+//        for (file in files) {
+//            val out = FileOutputStream("replayJSONs\\output$count.txt");
+//            println(rp.parse(file, "trackerevents", out));
+//            out.close();
+//            count++;
+//        }
+//    } catch(x: IOException) {
+//        println(x.message);
+//    }
+    val rp = ReplayParser();
+    rp.getStats(File("replayJSONs\\output0.txt"));
+//    var input = JsonReader(FileReader("output.txt"));
+//    while (input.hasNext()) {
+//        try {
+//            input.beginObject();
+//            input.isLenient = true;
+//            while (input.hasNext()) {
+//                val name = input.nextName();
+//                //System.out.print(name + " | ");
+//                if (name.equals("m_eventName")) {
+//                    val event = input.nextString();
+//                    if (event.equals("PlayerSpawned")) {
+//                        input.nextName();
+//                        input.skipValue();
+//                        input.nextName();
+//                        input.beginArray();
+//                        input.beginObject();
+//                        input.nextName();
+//                        input.skipValue();
+//                        input.nextName();
+//                        val playerId = input.nextInt();
+//                        input.endObject();
+//                        input.endArray();
+//                        input.nextName();
+//                        input.beginArray();
+//                        input.beginObject();
+//                        input.nextName();
+//                        input.skipValue();
+//                        input.nextName();
+//                        println(event + " | " + playerId + " | " + input.nextString());
+//                        input.endObject();
+//                        input.endArray();
+//                    }
+//                } else {
+//                    //System.out.println();
+//                    input.skipValue();
+//                }
+//            }
+//            //System.out.println("\n");
+//            input.endObject();
+//        } catch (y: IllegalStateException) {
+//            input.close();
+//            break;
+//        }
+//    }
 }
