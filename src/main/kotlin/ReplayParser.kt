@@ -1,24 +1,48 @@
 import com.google.gson.stream.JsonReader
-import org.python.core.PyInteger
-import org.python.core.PyString
-import org.python.core.PySystemState
-import org.python.util.PythonInterpreter
-import java.io.*
+import org.apache.commons.exec.CommandLine
+import org.apache.commons.exec.DefaultExecutor
+import org.apache.commons.exec.ExecuteException
+import org.apache.commons.exec.PumpStreamHandler
+import java.io.File
+import java.io.FileOutputStream
+import java.io.FileReader
+import java.io.IOException
 
 fun main(args: Array<String>) {
     var s = "";
     try {
         val folder = File("replays");
         val script = File("dependencies\\heroprotocol\\heroprotocol.py");
-        val lib = File("dependencies\\heroprotocol\\mpyq")
-        val output = File("output.txt")
-        for (file in folder.listFiles()) {
-            var state = PySystemState();
-            state.argv.clear ();
-            state.argv.append (PyString ("--trackerevents"));
-            state.argv.append (PyString (file.absolutePath));
-            val interpreter = PythonInterpreter(null, state);
-            interpreter.execfile(script.absolutePath);
+        var count = 0;
+        val files = folder.listFiles();
+        for(file in files){
+            println(files.size)
+            try {
+                println("Loop #$count")
+                val output = File("replayJSONs\\output$count.txt")
+                var cmdLine = CommandLine("python");
+                cmdLine.addArgument(script.absolutePath);
+                cmdLine.addArgument("--trackerevents");
+                cmdLine.addArgument(file.absolutePath);
+                var out = FileOutputStream(output);
+                var executor = DefaultExecutor();
+                executor.streamHandler = PumpStreamHandler(out);
+                executor.setExitValue(0);
+                try {
+                    var exitValue = executor.execute(cmdLine);
+                    println("Something Went Right")
+                    println(exitValue);
+                    out.flush();
+                    out.close();
+
+                }catch(x: ExecuteException){
+                    println("Something Failed")
+                    out.flush();
+                    out.close();
+                }
+            } finally {
+                count++;
+            }
         }
 
     } catch(x: IOException) {
