@@ -1,34 +1,24 @@
 import com.google.gson.stream.JsonReader
+import org.python.core.PyInteger
+import org.python.core.PyString
+import org.python.core.PySystemState
+import org.python.util.PythonInterpreter
 import java.io.*
 
 fun main(args: Array<String>) {
     var s = "";
     try {
         val folder = File("replays");
-        val jython = File("dependencies\\jython-standalone-2.7.0.jar");
         val script = File("dependencies\\heroprotocol\\heroprotocol.py");
+        val lib = File("dependencies\\heroprotocol\\mpyq")
         val output = File("output.txt")
-        for(file in folder.listFiles()){
-            println("java -jar ${jython.absolutePath} ${script.absolutePath} --trackerevents \"${file.absolutePath}\"");
-            var p = Runtime.getRuntime().exec("java -jar ${jython.absolutePath} ${script.absolutePath} --trackerevents \"${file.absolutePath}\"");
-
-            var stdInput = BufferedReader(
-                    InputStreamReader(p.inputStream));
-
-            var stdError = BufferedReader(
-                    InputStreamReader(p.errorStream));
-
-            // read the output from the command
-            println("Here is the standard output of the command:\n");
-            stdInput.forEachLine {
-                println(s);
-            }
-
-            // read any errors from the attempted command
-            println("Here is the standard error of the command (if any):\n");
-            stdError.forEachLine {
-                println(s);
-            }
+        for (file in folder.listFiles()) {
+            var state = PySystemState();
+            state.argv.clear ();
+            state.argv.append (PyString ("--trackerevents"));
+            state.argv.append (PyString (file.absolutePath));
+            val interpreter = PythonInterpreter(null, state);
+            interpreter.execfile(script.absolutePath);
         }
 
     } catch(x: IOException) {
@@ -38,7 +28,7 @@ fun main(args: Array<String>) {
     while (input.hasNext()) {
         try {
             input.beginObject();
-            input.setLenient(true);
+            input.isLenient = true;
             while (input.hasNext()) {
                 val name = input.nextName();
                 //System.out.print(name + " | ");
@@ -62,7 +52,7 @@ fun main(args: Array<String>) {
                         input.nextName();
                         input.skipValue();
                         input.nextName();
-                        System.out.println(event + " | " + playerId + " | " + input.nextString());
+                        println(event + " | " + playerId + " | " + input.nextString());
                         input.endObject();
                         input.endArray();
                     }

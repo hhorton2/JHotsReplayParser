@@ -2,6 +2,7 @@
   <library name="Maven: com.github.google:gson:1.7">
     <CLASSES>
       <root url="jar://$MAVEN_REPOSITORY$/com/github/google/gson/1.7/gson-1.7.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dependencies/jython-standalone-2.7.0.jar!/" />
     </CLASSES>
     <JAVADOC>
       <root url="jar://$MAVEN_REPOSITORY$/com/github/google/gson/1.7/gson-1.7-javadoc.jar!/" />
